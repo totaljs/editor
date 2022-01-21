@@ -106,9 +106,6 @@
 						var offset = self.element.offset();
 						msg.x += offset.left;
 						msg.y += offset.top;
-						msg.next = function(items) {
-							send({ callbackid: msg.callbackid, items: items });
-						};
 						config.contextmenu && self.SEEX(config.contextmenu, msg);
 						break;
 					case 'shortcut':
@@ -123,9 +120,6 @@
 						break;
 					case 'init':
 						init = true;
-						break;
-					case 'darkmode':
-						$('body').tclass('ui-dark', !!msg.value);
 						break;
 				}
 			};
@@ -173,6 +167,10 @@
 
 			self.markerrem = function(name) {
 				send({ TYPE: 'markerrem', value: name });
+			};
+
+			self.darkmode = function() {
+				send({ TYPE: 'darkmode', value: $('body').hclass('ui-dark') });
 			};
 
 			var settertimeout;

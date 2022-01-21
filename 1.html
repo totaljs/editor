@@ -66,6 +66,11 @@
 				return;
 			}
 
+			if (msg.TYPE === 'darkmode') {
+				$('body').tclass('ui-dark', !!msg.value);
+				return;
+			}
+
 			if (msg.TYPE === 'insert') {
 				msg.value && EDITOR.replaceSelection(msg.value);
 				return;
