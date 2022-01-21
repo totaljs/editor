@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Code editor</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=11" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="robots" content="all,follow" />
+	<link href="https://cdn.componentator.com/spa.min@19.css" rel="stylesheet" type="text/css" />
+	<script src="https://cdn.componentator.com/spa.min@19.js"></script>
+	<link href="editor.min@1.css" rel="stylesheet" type="text/css" />
+	<script src="editor.min@1.js"></script>
+</head>
+<body>
+
+	<div data---="editor__common.body__contextmenu:editor_contextmenu;shortcut:editor_shortcut;cursor:editor_cursor"></div>
+
+	<script>
+
+		var common = {};
+
+		common.callbackid = 1;
+		common.callbacks = {};
+		common.init = false;
+
+		function PROCESS(msg) {
+
+			if (!msg)
+				return;
+
+			if (msg.TYPE === 'init') {
+
+				if (common.init) {
+					var history = EDITOR.doc.history;
+					history.done.pop();
+					history.done.pop();
+				}
+
+				EDITOR.setOption('mode', msg.mode);
+				EDITOR.setOption('lint', msg.mode === 'javascript' || msg.mode === 'xml' || msg.mode === 'clientside' || msg.mode === 'serverside' || msg.mode === 'html' ? { esversion: 8, expr: true, evil: true, unused: true, shadow: true, node: true, browser: true } : false);
+				EDITOR.setOption('matchBrackets', true);
+				EDITOR.setOption('lineWrapping', msg.mode === 'markdown');
+				EDITOR.setOption('highlightSelectionMatches', { annotateScrollbar: true, delay: 100 });
+				EDITOR.setValue(msg.body || '');
+				common.init = true;
+				return;
+			}
+
+			if (msg.TYPE === 'insert') {
+				msg.value && EDITOR.replaceSelection(msg.value);
+				return;
+			}
+
+			if (msg.TYPE === 'command') {
+				EDITOR.focus();
+				EDITOR.execCommand(item.value);
+				return;
+			}
+
+			if (msg.TYPE === 'select') {
+				var cur = EDITOR.getCursor();
+				EDITOR.setCursor({ line: msg.from || 0, ch: msg.fromch || 0 });
+				EDITOR.centerLine(msg.from);
+				EDITOR.focus();
+				if (msg.to && msg.line === cur.line)
+					EDITOR.setSelection(EDITOR.getCursor(), { line: msg.to, ch: msg.toch || 0 });
+				return;
+			}
+
+			if (msg.TYPE === 'gotoline') {
+				msg.value && SETTER('editor/gotoline', msg.line, msg.ch);
+				return;
+			}
+
+			if (msg.TYPE === 'eval') {
+				msg.value && (new Function(msg.value)(EDITOR));
+				return;
+			}
+
+			if (msg.TYPE === 'body') {
+				SEND({ TYPE: 'body', body: EDITOR.getValue() });
+				return;
+			}
+
+			if (msg.callbackid) {
+				var callback = common.callbacks[msg.callbackid];
+				if (callback) {
+					delete common.callbacks[msg.callbackid];
+					setTimeout(callback, 2, msg);
+				}
+			}
+
+		}
+
+		W.addEventListener('message', function(e) {
+			if (typeof(e.data) === 'string') {
+				try {
+					PROCESS(PARSE(e.data));
+				} catch (e) {}
+			}
+		});
+
+	</script>
+
+</body>
+</html>

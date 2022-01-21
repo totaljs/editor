@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Code editor</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=11" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="robots" content="all,follow" />
+	<link href="https://cdn.componentator.com/spa.min@19.css" rel="stylesheet" type="text/css" />
+	<script src="https://cdn.componentator.com/spa.min@19.js"></script>
+	<link href="https://cdn.componentator.com/flowstream/editor.min@1.css" rel="stylesheet" type="text/css" />
+	<script src="editor.min.js"></script>
+	<style>
+		html,body { overflow: hidden; }
+		.CodeMirror { border: 0; font-family: Menlo, Consolas, monospace; font-size: 15px; contain: strict; }
+		.CodeMirror-gutters { background-color: #FFF; }
+		.CodeMirror-scroll { overflow-scrolling: touch; }
+		.CodeMirror-scrollbar-filler { background-color: #F0F0F0; }
+		.CodeMirror-simplescroll-horizontal div, .CodeMirror-simplescroll-vertical div { position: absolute; background: #D0D0D0; box-sizing: border-box; border-radius: var(--radius); }
+		.CodeMirror-simplescroll-horizontal, .CodeMirror-simplescroll-vertical { position: absolute; z-index: 6; background: #F0F0F0; }
+		.CodeMirror-simplescroll-horizontal { bottom: 0; left: 0; height: 8px; }
+		.CodeMirror-simplescroll-horizontal div { bottom: 0; height: 100%; }
+		.CodeMirror-simplescroll-vertical { right: 0; top: 0; width: 8px; }
+		.CodeMirror-simplescroll-vertical div { right: 0; width: 100%; }
+		.CodeMirror-overlayscroll .CodeMirror-scrollbar-filler, .CodeMirror-overlayscroll .CodeMirror-gutter-filler { display: none; }
+		.CodeMirror-overlayscroll-horizontal div, .CodeMirror-overlayscroll-vertical div { position: absolute; background: #D0D0D0; border-radius: var(--radius); }
+		.CodeMirror-overlayscroll-horizontal, .CodeMirror-overlayscroll-vertical { position: absolute; z-index: 6; }
+		.CodeMirror-overlayscroll-horizontal { bottom: 0; left: 0; height: 6px; }
+		.CodeMirror-overlayscroll-horizontal div { bottom: 0; height: 100%; }
+		.CodeMirror-overlayscroll-vertical { right: 0; top: 0; width: 6px; }
+		.CodeMirror-overlayscroll-vertical div { right: 0; width: 100%; }
+		.cm-trailingspace { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==); background-position: bottom left; background-repeat: repeat-x; }
+		.cm-tab { background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAKElEQVRIiWNgGAWjYBQMacDIwMBgzMDAcBZKw8BQ4I+CUTAKRsEgAAAA4AwCz6/F0QAAAABJRU5ErkJggg==) no-repeat 100% 50%; }
+		.cm-diff { font-size: 14px; font-weight: bold; position: absolute; left: 6px; }
+		.cm-gutter-color { margin-left: 8px; }
+		.cm-searching { background: rgba(247,75,75,0.3); animation: 0.7s blink infinite forwards; }
+		.cm-matchhighlight { outline: 1px solid #4B85F7; }
+		.CodeMirror-selection-highlight-scrollbar { background-color: #777; }
+		.CodeMirror-gutters { text-align: right; }
+		.CodeMirror-linenumbers { width: 30px !important; overflow: hidden; }
+		.CodeMirror-linenumber { overflow: hidden; font-size: 13px; width: 30px !important; text-overflow: ellipsis; padding-top: 1px; }
+		.CodeMirror-lint-markers { width: 16px; }
+		.GutterColor { width: 12px; }
+		.GutterUser { width: 15px; }
+		.GutterDiff { width: 12px; }
+		.cm-variable-T { background-color: rgba(104,178,91,.3); color: black; }
+		.cm-variable-L { background-color: rgba(104,178,191,.3); color: black; }
+		.cm-variable-A { background-color: rgba(191,61,162,.3); color: black; }
+		.cm-variable-S { background-color: rgba(255,59,231,.26); color: #ce1ad6; font-weight: bold; }
+		.cm-variable-J { background-color: rgba(0,152,189,.2); color: #0098BD; font-weight: bold; }
+		.cm-variable-E { background-color: rgba(97,142,193,.2); color: #618EC1; font-weight: bold; }
+		.cm-variable-R { background-color: rgba(196,210,90,.35); color: #97a728; font-weight: bold; }
+		.cm-variable-B { background-color: rgba(228,228,228,.35); color: #2183e8; font-weight: bold; }
+		.cm-variable-API { background-color: rgba(104,178,91,.3); color: black; font-weight: bold; }
+		.cm-changed-line { background-color: rgb(253,252,244,0.8); }
+		.cm-route-http { color: #ca5d0f; }
+		.cm-route-socket { color: #a20aab; }
+		.cm-route-api { color: #8e0663; }
+		.cm-route-file { color: #208288; }
+
+		.colorize { animation: colorize 1.3s infinite alternate; }
+
+		@keyframes colorize {
+			0% { color: #d7cd17; }
+			15% { color: #83c83c; }
+			30% { color: #2e67c5; }
+			45% { color: #b92865; }
+			60% { color: #62c9ca; }
+			75% { color: white; }
+			100% { color: #8c42f6; }
+		}
+
+	</style>
+</head>
+<body>
+
+	<div data---="LAZY menu__null__style:2"></div>
+	<div data---="LAZY colorpicker"></div>
+	<div data---="LAZY faicons"></div>
+
+	<div data---="editor__common.body__contextmenu:editor_contextmenu;shortcut:editor_shortcut"></div>
+
+	<script>
+
+		var common = {};
+
+		common.callbackid = 1;
+		common.callbacks = {};
+
+		W.addEventListener('message', function(e) {
+
+			if (typeof(e.data) !== 'string')
+				return;
+
+			var msg;
+
+			try {
+				msg = PARSE(e.data);
+			} catch (e) {
+				return;
+			}
+
+			if (!msg)
+				return;
+
+			if (msg.TYPE === 'init') {
+
+				EDITOR.setValue(msg.body || '');
+				return;
+			}
+
+			if (msg.TYPE === 'insert') {
+				msg.value && EDITOR.replaceSelection(msg.value);
+				return;
+			}
+
+			if (msg.TYPE === 'command') {
+				EDITOR.focus();
+				EDITOR.execCommand(item.value);
+				return;
+			}
+
+			if (msg.TYPE === 'select') {
+				var cur = EDITOR.getCursor();
+				EDITOR.setCursor({ line: msg.from || 0, ch: msg.fromch || 0 });
+				EDITOR.centerLine(msg.from);
+				EDITOR.focus();
+				if (msg.to && msg.line === cur.line)
+					EDITOR.setSelection(EDITOR.getCursor(), { line: msg.to, ch: msg.toch || 0 });
+				return;
+			}
+
+			if (msg.TYPE === 'gotoline') {
+				msg.value && SETTER('editor/gotoline', msg.line, msg.ch);
+				return;
+			}
+
+			if (msg.TYPE === 'eval') {
+				msg.value && (new Function(msg.value)(EDITOR));
+				return;
+			}
+
+			if (msg.TYPE === 'body') {
+				SEND({ TYPE: 'body', body: EDITOR.getValue() });
+				return;
+			}
+
+			if (msg.callbackid) {
+				var callback = common.callbacks[msg.callbackid];
+				if (callback) {
+					delete common.callbacks[msg.callbackid];
+					setTimeout(callback, 2, msg);
+				}
+			}
+
+		});
+
+		common.body = `<style>
+	.font { color: #E0E0E0; }
+</style>
+
+<div data---="clipboardimage__null__quality:90"></div>`;
+
+	</script>
+
+</body>
+</html>
