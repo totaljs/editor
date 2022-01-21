@@ -37,12 +37,17 @@
 					history.done.pop();
 				}
 
+				// msg.docid
+
 				EDITOR.setOption('mode', msg.mode);
 				EDITOR.setOption('lint', msg.mode === 'javascript' || msg.mode === 'xml' || msg.mode === 'clientside' || msg.mode === 'serverside' || msg.mode === 'html' ? { esversion: 8, expr: true, evil: true, unused: true, shadow: true, node: true, browser: true } : false);
 				EDITOR.setOption('matchBrackets', true);
 				EDITOR.setOption('lineWrapping', msg.mode === 'markdown');
 				EDITOR.setOption('highlightSelectionMatches', { annotateScrollbar: true, delay: 100 });
-				EDITOR.setValue(msg.body || '');
+				EDITOR.setValue(msg.body || msg.value || '');
+				EDITOR.refresh();
+				EDITOR.scrollTo(0, 0);
+				EDITOR.setCursor(0);
 				common.init = true;
 				return;
 			}
@@ -89,7 +94,7 @@
 			}
 
 			if (msg.TYPE === 'body') {
-				SEND({ TYPE: 'body', value: EDITOR.getValue() });
+				SEND({ TYPE: 'body', callbackid: msg.callbackid, value: EDITOR.getValue() });
 				return;
 			}
 
@@ -100,7 +105,6 @@
 					setTimeout(callback, 2, msg);
 				}
 			}
-
 		}
 
 		W.addEventListener('message', function(e) {

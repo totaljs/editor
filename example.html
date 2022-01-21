@@ -14,17 +14,37 @@
 
 	<div class="padding">
 		<div style="width:600px;height:300px;border:1px solid #E0E0E0;">
-			<div data---="editor__common.body"></div>
+			<div data---="editor__common.body__mode:clientside"></div>
 		</div>
 	</div>
 
 	<script>
 
-		COMPONENT('editor', 'parent:auto', function(self, config) {
+		COMPONENT('editor', 'parent:auto;mode:clientside', function(self, config) {
 
 			var iframe;
+			var savetimeout;
+			var callbacks = {};
+			var callbackid = 1;
+			var skip = false;
+			var init = false;
 
-			var send = function(msg) {
+			var save = function() {
+				savetimeout = null;
+				send({ TYPE: 'body' }, function(msg) {
+					skip = true;
+					self.set(msg.value);
+				});
+			};
+
+			var send = function(msg, callback) {
+
+				if (callback) {
+					var id = (callbackid++) + '';
+					msg.callbackid = id;
+					callbacks[id] = callback;
+				}
+
 				iframe[0].contentWindow.postMessage(STRINGIFY(msg), '*');
 			};
 
@@ -36,10 +56,18 @@
 					return;
 
 				msg = PARSE(msg);
-				console.log(msg);
 
 				if (msg.id !== self.ID)
 					return;
+
+				if (msg.callbackid) {
+					var fn = callbacks[msg.callbackid];
+					if (fn) {
+						delete callbacks[msg.callbackid];
+						fn(msg);
+					}
+					return;
+				}
 
 				switch (msg.TYPE) {
 					case 'menu':
@@ -57,17 +85,19 @@
 					case 'shortcut':
 						break;
 					case 'cursor':
+						savetimeout && clearTimeout(savetimeout);
+						savetimeout = setTimeout(save, 500);
 						break;
-					case 'body':
-						// save
-						var body = msg.value || msg.body;
+					case 'init':
+						init = true;
 						break;
 				}
 
 			};
 
 			self.make = function() {
-				self.append('<iframe src="https://cdn.componentator.com/editor/1.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
+				//self.append('<iframe src="https://cdn.componentator.com/editor/1.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
+				self.append('<iframe src="editor.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
 				iframe = self.find('iframe');
 				self.resize();
 				$(W).on('message', onmessage);
@@ -84,8 +114,31 @@
 				iframe.css({ width: w, height: h });
 			};
 
+			var settertimeout;
+
+			self.setter = function(value) {
+
+				if (skip) {
+					skip = false;
+					return;
+				}
+
+console.log(init);
+				if (init) {
+					settertimeout = null;
+					send({ TYPE: 'init', mode: config.mode, value: self.get() });
+				} else {
+					settertimeout && clearTimeout(settertimeout);
+					settertimeout = setTimeout(self.setter, 100);
+				}
+
+			};
+
 
 		});
+
+		var common = {};
+		common.body = 'KOKOTARIS';
 
 	</script>
 

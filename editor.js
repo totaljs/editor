@@ -2815,6 +2815,7 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 
 	self.getter = null;
 	self.nocompile();
+	self.readonly();
 
 	var lastIndexOf = function(str, chfrom) {
 		for (var i = chfrom; i > 0; i--) {
@@ -3039,14 +3040,14 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		W.EDITOR = editor = CodeMirror(self.dom, opt);
 		self.editor = editor;
 
-        var emitcursortimeout;
-        var emitcursor = function() {
-            emitcursortimeout = null;
-            editor_cursor(editor);
-        };
+		var emitcursortimeout;
+		var emitcursor = function() {
+			emitcursortimeout = null;
+			editor_cursor(editor);
+		};
 
 		editor.on('cursorActivity', function() {
-            emitcursortimeout && clearTimeout(emitcursortimeout);
+			emitcursortimeout && clearTimeout(emitcursortimeout);
 			emitcursortimeout = setTimeout(emitcursor, 80);
 		});
 
@@ -3157,6 +3158,7 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 
 		self.resizeforce();
 		self.on('resize + resize2', self.resize);
+		SEND({ TYPE: 'init' });
 	};
 
 	self.insertcustom = function(fn) {
@@ -3165,6 +3167,7 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		fn(editor.editor, cur, c);
 	};
 
+	/*
 	self.setter = function(value, path, type) {
 
 		skip = true;
@@ -3186,7 +3189,7 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 			editor.refresh();
 		}, 2000);
 
-	};
+	};*/
 
 }, [function(next) {
 
@@ -3366,16 +3369,12 @@ function editor_shortcut(type) {
 }
 
 function editor_contextmenu(e, editor) {
-    var msg = {};
-    msg.TYPE = 'contextmenu';
-    msg.x = e.pageX;
-    msg.y = e.pageY;
-    msg.selections = EDITOR.getSelections();
-    SEND(msg, function(msg) {
-		msg.items && msg.items.length && SETTER('menu/showxy', e.pageX + 5, e.pageY - 15, msg.items, function(selected) {
-			SEND({ TYPE: 'contextmenu', callbackid: msg.callbackid, value: selected });
-		});
-	});
+	var msg = {};
+	msg.TYPE = 'contextmenu';
+	msg.x = e.pageX;
+	msg.y = e.pageY;
+	msg.selections = EDITOR.getSelections();
+	SEND(msg);
 }
 
 function SEND(msg, callback) {
