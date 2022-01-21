@@ -75,12 +75,14 @@
 
 				var msg = e.originalEvent ? e.originalEvent.data : '';
 
-				if (typeof(msg) !== 'string' || msg.indexOf('"totaleditor"') === -1)
+				if (typeof(msg) === 'string') {
+					if (msg.indexOf('"totaleditor"') === -1 || msg.indexOf('"id":"' + self.ID +'"') === -1)
+						return;
+					msg = PARSE(msg);
+				} else if (!msg)
 					return;
 
-				msg = PARSE(msg);
-
-				if (msg.id !== self.ID)
+				if (msg.totaleditor !== 1 || msg.id !== self.ID)
 					return;
 
 				if (msg.callbackid) {
@@ -126,8 +128,7 @@
 			};
 
 			self.make = function() {
-				//self.append('<iframe src="https://cdn.componentator.com/editor/1.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
-				self.append('<iframe src="editor.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
+				self.append('<iframe src="https://cdn.componentator.com/editor/1.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
 				iframe = self.find('iframe');
 				self.resize();
 				$(W).on('message', onmessage);

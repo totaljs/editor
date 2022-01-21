@@ -3622,7 +3622,7 @@ function SEND(msg, callback) {
 
 	msg.id = NAV.query.id;
 	msg.totaleditor = 1;
-	W.parent.postMessage(JSON.stringify(msg), '*');
+	W.parent.postMessage(msg, '*');
 }
 
 // DONE
