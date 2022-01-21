@@ -16,11 +16,16 @@
 
 	<div class="padding">
 		<div style="width:600px;height:300px;border:1px solid #E0E0E0;">
-			<div data---="editor__common.body__mode:clientside;contextmenu:editorcontextmenu"></div>
+			<div data---="cloudeditor__editormodel__contextmenu:editorcontextmenu;event:editorevent"></div>
 		</div>
 	</div>
 
 	<script>
+
+		function editorevent(type, value) {
+			console.log(type, value);
+			SETTER('!menu/hide');
+		}
 
 		function editorcontextmenu(obj) {
 			var opt = {};
@@ -34,10 +39,11 @@
 			opt.callback = function(selected) {
 				console.log(selected);
 			};
+			console.log(opt);
 			SETTER('menu/show', opt);
 		}
 
-		COMPONENT('editor', 'parent:auto;mode:clientside', function(self, config) {
+		COMPONENT('cloudeditor', 'parent:auto;autosave:1', function(self, config) {
 
 			var iframe;
 			var savetimeout;
@@ -88,7 +94,10 @@
 
 				switch (msg.TYPE) {
 					case 'click':
-						SETTER('menu/hide');
+						config.event && self.SEEX(config.event, msg.TYPE);
+						break;
+					case 'errors':
+						config.event && self.SEEX(config.event, msg.TYPE, msg.value);
 						break;
 					case 'menu':
 					case 'contextmenu':
@@ -100,23 +109,20 @@
 						};
 						config.contextmenu && self.SEEX(config.contextmenu, msg);
 						break;
-					case 'menu_selected':
-						break;
 					case 'shortcut':
+						config.event && self.SEEX(config.event, msg.TYPE, msg.value);
 						break;
 					case 'cursor':
-						SETTER('menu/hide');
-						savetimeout && clearTimeout(savetimeout);
-						savetimeout = setTimeout(save, 500);
+						config.event && self.SEEX(config.event, msg.TYPE, msg.value);
+						if (config.autosave) {
+							savetimeout && clearTimeout(savetimeout);
+							savetimeout = setTimeout(save, 500);
+						}
 						break;
 					case 'init':
 						init = true;
 						break;
-					case 'clear':
-						SETTER('editor/clear');
-						break;
 				}
-
 			};
 
 			self.make = function() {
@@ -132,14 +138,19 @@
 			};
 
 			self.replace = function(text, to) {
-				send({ TYPE: 'replace', text: text, to: to });
+				send({ TYPE: 'replace', value: text, to: to });
 			};
 
-			self.save = function() {
+			self.save = function(callback) {
 				send({ TYPE: 'body' }, function(msg) {
 					skip = true;
 					send({ TYPE: 'clear' });
-					self.set(msg.value);
+					if (callback) {
+						callback(msg.value);
+					} else {
+						self.get().body = msg.value;
+						self.update(true);
+					}
 				});
 			};
 
@@ -150,6 +161,14 @@
 				var w = parent.width();
 				var h = parent.height();
 				iframe.css({ width: w, height: h });
+			};
+
+			self.markeradd = function(from, to, name, color) {
+				send({ TYPE: 'markeradd', from: from, to: to, value: name, color: color });
+			};
+
+			self.markerrem = function(name) {
+				send({ TYPE: 'markerrem', value: name });
 			};
 
 			var settertimeout;
@@ -163,7 +182,8 @@
 
 				if (init) {
 					settertimeout = null;
-					send({ TYPE: 'init', mode: config.mode, value: self.get() });
+					var model = self.get();
+					model && send({ TYPE: 'init', mode: model.type || 'clientside', value: model.body });
 				} else {
 					settertimeout && clearTimeout(settertimeout);
 					settertimeout = setTimeout(self.setter, 100);
@@ -173,9 +193,13 @@
 
 		});
 
-		var common = {};
+		var editormodel = {};
 
-		common.body = '';
+		editormodel.body = '\n\n\n<div>sadsda</div>\n\n\n';
+		editormodel.type = 'clientside';
+
+		// editormodel.body = 'var a = x;';
+		// editormodel.type = 'serverside';
 
 	</script>
 

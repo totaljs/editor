@@ -56,7 +56,7 @@
 				var val = EDITOR.getValue();
 				var index = null;
 				while (index !== -1) {
-					index = val.indexOf(msg.text, index || 0);
+					index = val.indexOf(msg.text || msg.value, index || 0);
 					if (index !== -1)
 						val = val.substring(0, index) + msg.to + val.substring(index + msg.text.length);
 				}
@@ -85,10 +85,36 @@
 				return;
 			}
 
+			if (msg.TYPE === 'change') {
+				EDITOR.replaceRange(msg.value, msg.from, msg.to);
+				var history = EDITOR.doc.history.done;
+				history.pop();
+				history.pop();
+				return;
+			}
+
+			if (msg.TYPE === 'markeradd') {
+				EDITOR.Total.markeradd(msg.from, msg.to, msg.value, msg.color);
+				return;
+			}
+
+			if (msg.TYPE === 'markerrem') {
+				EDITOR.Total.markerrem(msg.value);
+				return;
+			}
+
 			if (msg.TYPE === 'command') {
 				EDITOR.focus();
-				EDITOR.execCommand(item.value);
+				EDITOR.execCommand(msg.value);
 				return;
+			}
+
+			if (msg.TYPE === 'search') {
+				var cursor = EDITOR.getSearchCursor(msg.value);
+				var output = [];
+				while (cursor.findNext())
+					output.push({ from: cursor.from(), to: cursor.to() });
+				SEND({ TYPE: 'search', callbackid: msg.callbackid, value: output });
 			}
 
 			if (msg.TYPE === 'select') {
