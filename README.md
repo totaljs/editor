@@ -19,6 +19,21 @@ __Cons__:
 - 1.5 MB javascript
 - 13 kB css
 
+### Compiling
+
+__Dependencies__:
+
+```bash
+$ npm install -g uglifyjs
+$ npm install -g uglifycss
+````
+
+__Building__:
+
+```bash
+$ node minify.sh
+````
+
 ### Documentation
 
 Soon.

@@ -109,6 +109,12 @@
 				return;
 			}
 
+			if (msg.TYPE === 'focus') {
+				W.focus();
+				EDITOR.focus();
+				return;
+			}
+
 			if (msg.TYPE === 'command') {
 				EDITOR.focus();
 				EDITOR.execCommand(msg.value);
@@ -133,7 +139,7 @@
 				return;
 			}
 
-			if (msg.TYPE === 'gotoline') {
+			if (msg.TYPE === 'goto') {
 				msg.value && SETTER('editor/gotoline', msg.value);
 				return;
 			}

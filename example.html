@@ -10,7 +10,7 @@
 	<link href="https://cdn.componentator.com/spa.min@19.css" rel="stylesheet" type="text/css" />
 	<script src="https://cdn.componentator.com/spa.min@19.js"></script>
 </head>
-<body class="ui-dark">
+<body>
 
 	<div data---="menu__null__type:2"></div>
 
@@ -96,9 +96,8 @@
 
 				switch (msg.TYPE) {
 					case 'click':
-						config.event && self.SEEX(config.event, msg.TYPE);
-						break;
 					case 'errors':
+					case 'shortcut':
 						config.event && self.SEEX(config.event, msg.TYPE, msg.value);
 						break;
 					case 'menu':
@@ -107,9 +106,6 @@
 						msg.x += offset.left;
 						msg.y += offset.top;
 						config.contextmenu && self.SEEX(config.contextmenu, msg);
-						break;
-					case 'shortcut':
-						config.event && self.SEEX(config.event, msg.TYPE, msg.value);
 						break;
 					case 'cursor':
 						config.event && self.SEEX(config.event, msg.TYPE, msg.value);
@@ -137,6 +133,15 @@
 
 			self.replace = function(text, to) {
 				send({ TYPE: 'replace', value: text, to: to });
+			};
+
+			self.insert = function(value) {
+				send({ TYPE: 'insert', value: value });
+			};
+
+			self.focus = function() {
+				iframe.focus();
+				send({ TYPE: 'focus' });
 			};
 
 			self.save = function(callback) {
