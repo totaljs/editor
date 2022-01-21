@@ -2850,8 +2850,8 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 			editor.setSize('100%', config.height + 'px');
 	};
 
-	self.gotoline = function(line, ch) {
-		var cur = { line: line, ch: ch || 0 };
+	self.gotoline = function(pos) {
+		var cur = { line: pos.line, ch: pos.ch || 0 };
 		var t = editor.charCoords(cur, 'local').top;
 		var mid = editor.getScrollerElement().offsetHeight / 2;
 		cur.line--;
@@ -3079,8 +3079,12 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		editor.on('change', function(a, b) {
 
 			if (b.origin === 'setValue') {
-				memory = editor.getValue().split('\n');
-				return;
+				if (editor.keepdiff) {
+					editor.keepdiff = false;
+				} else {
+					memory = editor.getValue().split('\n');
+					return;
+				}
 			}
 
 			var lf = b.from.line;
@@ -3161,35 +3165,19 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		SEND({ TYPE: 'init' });
 	};
 
+	self.clear = function() {
+		var count = editor.lineCount();
+		for (var i = 0; i < count; i++)
+			editor.removeLineClass(i, null, 'cm-changed-line');
+		editor.doc.clearGutter('GutterDiff');
+		memory = editor.getValue().split('\n');
+	};
+
 	self.insertcustom = function(fn) {
 		var cur = editor.editor.getCursor();
 		var c = editor.editor.getRange({ line: cur.line, ch: cur.ch - 1 }, { line: cur.line, ch: cur.ch });
 		fn(editor.editor, cur, c);
 	};
-
-	/*
-	self.setter = function(value, path, type) {
-
-		skip = true;
-		editor.setValue(value || '');
-		editor.refresh();
-
-		setTimeout(function() {
-			editor.refresh();
-			editor.scrollTo(0, 0);
-			type && editor.setCursor(0);
-		}, 200);
-
-		setTimeout(function() {
-			editor.refresh();
-			skip = false;
-		}, 1000);
-
-		setTimeout(function() {
-			editor.refresh();
-		}, 2000);
-
-	};*/
 
 }, [function(next) {
 
@@ -3373,6 +3361,8 @@ function editor_contextmenu(e, editor) {
 	msg.TYPE = 'contextmenu';
 	msg.x = e.pageX;
 	msg.y = e.pageY;
+	var cur = EDITOR.getCursor();
+	msg.cursor = { line: cur.line, ch: cur.ch };
 	msg.selections = EDITOR.getSelections();
 	SEND(msg);
 }

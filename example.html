@@ -12,13 +12,30 @@
 </head>
 <body>
 
+	<div data---="menu__null__type:2"></div>
+
 	<div class="padding">
 		<div style="width:600px;height:300px;border:1px solid #E0E0E0;">
-			<div data---="editor__common.body__mode:clientside"></div>
+			<div data---="editor__common.body__mode:clientside;contextmenu:editorcontextmenu"></div>
 		</div>
 	</div>
 
 	<script>
+
+		function editorcontextmenu(obj) {
+			var opt = {};
+			opt.x = obj.x;
+			opt.y = obj.y;
+			opt.items = [];
+			opt.items.push({ id: '1', name: 'Test item 1' });
+			opt.items.push({ id: '2', name: 'Test item 2' });
+			opt.items.push({ id: '3', name: 'Test item 3' });
+			opt.items.push({ id: '4', name: 'Test item 4' });
+			opt.callback = function(selected) {
+				console.log(selected);
+			};
+			SETTER('menu/show', opt);
+		}
 
 		COMPONENT('editor', 'parent:auto;mode:clientside', function(self, config) {
 
@@ -70,6 +87,9 @@
 				}
 
 				switch (msg.TYPE) {
+					case 'click':
+						SETTER('menu/hide');
+						break;
 					case 'menu':
 					case 'contextmenu':
 						var offset = self.element.offset();
@@ -85,11 +105,15 @@
 					case 'shortcut':
 						break;
 					case 'cursor':
+						SETTER('menu/hide');
 						savetimeout && clearTimeout(savetimeout);
 						savetimeout = setTimeout(save, 500);
 						break;
 					case 'init':
 						init = true;
+						break;
+					case 'clear':
+						SETTER('editor/clear');
 						break;
 				}
 
@@ -107,6 +131,20 @@
 				$(W).off('message', onmessage);
 			};
 
+			self.replace = function(text, to) {
+				send({ TYPE: 'replace', text: text, to: to });
+			};
+
+			self.save = function() {
+				send({ TYPE: 'body' }, function(msg) {
+					skip = true;
+					send({ TYPE: 'clear' });
+					self.set(msg.value);
+				});
+			};
+
+			self.send = send;
+
 			self.resize = function() {
 				var parent = self.parent(config.parent);
 				var w = parent.width();
@@ -123,7 +161,6 @@
 					return;
 				}
 
-console.log(init);
 				if (init) {
 					settertimeout = null;
 					send({ TYPE: 'init', mode: config.mode, value: self.get() });
@@ -134,11 +171,11 @@ console.log(init);
 
 			};
 
-
 		});
 
 		var common = {};
-		common.body = 'KOKOTARIS';
+
+		common.body = '';
 
 	</script>
 
