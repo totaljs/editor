@@ -14,7 +14,7 @@
 </head>
 <body>
 
-	<div data---="editor__common.body__contextmenu:editor_contextmenu;shortcut:editor_shortcut;cursor:editor_cursor"></div>
+	<div data---="editor__common.body"></div>
 
 	<script>
 
@@ -52,6 +52,16 @@
 				return;
 			}
 
+			if (msg.TYPE === 'replaceselections') {
+				msg.value && EDITOR.replaceSelections(msg.value);
+				return;
+			}
+
+			if (msg.TYPE === 'replaceselection') {
+				msg.value && EDITOR.replaceSelection(msg.value);
+				return;
+			}
+
 			if (msg.TYPE === 'command') {
 				EDITOR.focus();
 				EDITOR.execCommand(item.value);
@@ -60,11 +70,11 @@
 
 			if (msg.TYPE === 'select') {
 				var cur = EDITOR.getCursor();
-				EDITOR.setCursor({ line: msg.from || 0, ch: msg.fromch || 0 });
-				EDITOR.centerLine(msg.from);
+				EDITOR.setCursor(msg.from);
+				EDITOR.centerLine(msg.from.line);
 				EDITOR.focus();
-				if (msg.to && msg.line === cur.line)
-					EDITOR.setSelection(EDITOR.getCursor(), { line: msg.to, ch: msg.toch || 0 });
+				if (msg.to && msg.to.line === cur.line)
+					EDITOR.setSelection(EDITOR.getCursor(), msg.to);
 				return;
 			}
 
@@ -79,7 +89,7 @@
 			}
 
 			if (msg.TYPE === 'body') {
-				SEND({ TYPE: 'body', body: EDITOR.getValue() });
+				SEND({ TYPE: 'body', value: EDITOR.getValue() });
 				return;
 			}
 

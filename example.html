@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Code editor</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=11" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="robots" content="all,follow" />
+	<link href="https://cdn.componentator.com/spa.min@19.css" rel="stylesheet" type="text/css" />
+	<script src="https://cdn.componentator.com/spa.min@19.js"></script>
+</head>
+<body>
+
+	<div class="padding">
+		<div style="width:600px;height:300px;border:1px solid #E0E0E0;">
+			<div data---="editor__common.body"></div>
+		</div>
+	</div>
+
+	<script>
+
+		COMPONENT('editor', 'parent:auto', function(self, config) {
+
+			var iframe;
+
+			var send = function(msg) {
+				iframe[0].contentWindow.postMessage(STRINGIFY(msg), '*');
+			};
+
+			var onmessage = function(e) {
+
+				var msg = e.originalEvent ? e.originalEvent.data : '';
+
+				if (typeof(msg) !== 'string' || msg.indexOf('"totaleditor"') === -1)
+					return;
+
+				msg = PARSE(msg);
+				console.log(msg);
+
+				if (msg.id !== self.ID)
+					return;
+
+				switch (msg.TYPE) {
+					case 'menu':
+					case 'contextmenu':
+						var offset = self.element.offset();
+						msg.x += offset.left;
+						msg.y += offset.top;
+						msg.next = function(items) {
+							send({ callbackid: msg.callbackid, items: items });
+						};
+						config.contextmenu && self.SEEX(config.contextmenu, msg);
+						break;
+					case 'menu_selected':
+						break;
+					case 'shortcut':
+						break;
+					case 'cursor':
+						break;
+					case 'body':
+						// save
+						var body = msg.value || msg.body;
+						break;
+				}
+
+			};
+
+			self.make = function() {
+				self.append('<iframe src="https://cdn.componentator.com/editor/1.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
+				iframe = self.find('iframe');
+				self.resize();
+				$(W).on('message', onmessage);
+			};
+
+			self.destroy = function() {
+				$(W).off('message', onmessage);
+			};
+
+			self.resize = function() {
+				var parent = self.parent(config.parent);
+				var w = parent.width();
+				var h = parent.height();
+				iframe.css({ width: w, height: h });
+			};
+
+
+		});
+
+	</script>
+
+</body>
+</html>

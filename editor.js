@@ -3009,6 +3009,12 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 			editor_shortcut(type);
 		};
 
+		var addshortcut = function(type) {
+			return function() {
+				editor_shortcut(type);
+			};
+		};
+
 		var content = config.label || self.html();
 		var opt = {};
 		opt.lineNumbers = config.linenumbers;
@@ -3028,13 +3034,20 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		opt.matchBrackets = true;
 		opt.showTrailingSpace = false;
 		opt.rulers = [{ column: 130, lineStyle: 'dashed' }, { column: -1, lineStyle: 'dashed' }];
-		opt.extraKeys = { 'Alt-F': 'findPersistent', 'Alt-Enter': adddate, 'Ctrl-Enter': findnext, 'Ctrl-/': comment, 'Cmd-/': comment, 'Ctrl--': comment, 'Cmd--': comment, 'Cmd-Enter': findnext, 'Esc': clearsearch, 'Cmd-D': findmatch, 'Ctrl-D': findmatch, 'Cmd-S': shortcut('save'), 'Ctrl-S': shortcut('save'), 'Alt-W': shortcut('close'), 'Cmd-W': shortcut('close'), Enter: 'newlineAndIndentContinue', Tab: tabulator, 'Alt-Tab': shortcut('nexttab') };
+		opt.extraKeys = { 'Alt-F': 'findPersistent', 'Alt-Enter': adddate, 'Ctrl-Enter': findnext, 'Ctrl-/': comment, 'Cmd-/': comment, 'Ctrl--': comment, 'Cmd--': comment, 'Cmd-Enter': findnext, 'Esc': clearsearch, 'Cmd-D': findmatch, 'Ctrl-D': findmatch, 'Cmd-S': addshortcut('save'), 'Ctrl-S': addshortcut('save'), 'Alt-W': addshortcut('close'), 'Cmd-W': addshortcut('close'), Enter: 'newlineAndIndentContinue', Tab: tabulator, 'Alt-Tab': addshortcut('nexttab') };
 
 		W.EDITOR = editor = CodeMirror(self.dom, opt);
 		self.editor = editor;
 
+        var emitcursortimeout;
+        var emitcursor = function() {
+            emitcursortimeout = null;
+            editor_cursor(editor);
+        };
+
 		editor.on('cursorActivity', function() {
-			editor_cursor(editor);
+            emitcursortimeout && clearTimeout(emitcursortimeout);
+			emitcursortimeout = setTimeout(emitcursor, 80);
 		});
 
 		editor.on('endCompletion', function(a, b) {
@@ -3353,9 +3366,14 @@ function editor_shortcut(type) {
 }
 
 function editor_contextmenu(e, editor) {
-	SEND({ TYPE: 'menu', x: e.pageX, y: e.pageY }, function(msg) {
+    var msg = {};
+    msg.TYPE = 'contextmenu';
+    msg.x = e.pageX;
+    msg.y = e.pageY;
+    msg.selections = EDITOR.getSelections();
+    SEND(msg, function(msg) {
 		msg.items && msg.items.length && SETTER('menu/showxy', e.pageX + 5, e.pageY - 15, msg.items, function(selected) {
-			SEND({ TYPE: 'menu_selected', value: selected });
+			SEND({ TYPE: 'contextmenu', callbackid: msg.callbackid, value: selected });
 		});
 	});
 }
@@ -3368,7 +3386,7 @@ function SEND(msg, callback) {
 	}
 
 	msg.id = NAV.query.id;
-	msg.totaleditor = true;
+	msg.totaleditor = 1;
 	W.parent.postMessage(JSON.stringify(msg), '*');
 }
 
