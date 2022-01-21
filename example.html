@@ -10,7 +10,7 @@
 	<link href="https://cdn.componentator.com/spa.min@19.css" rel="stylesheet" type="text/css" />
 	<script src="https://cdn.componentator.com/spa.min@19.js"></script>
 </head>
-<body>
+<body class="ui-dark">
 
 	<div data---="menu__null__type:2"></div>
 
@@ -124,11 +124,14 @@
 					case 'init':
 						init = true;
 						break;
+					case 'darkmode':
+						$('body').tclass('ui-dark', !!msg.value);
+						break;
 				}
 			};
 
 			self.make = function() {
-				self.append('<iframe src="https://cdn.componentator.com/editor/1.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
+				self.append('<iframe src="1.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
 				iframe = self.find('iframe');
 				self.resize();
 				$(W).on('message', onmessage);
@@ -184,7 +187,7 @@
 				if (init) {
 					settertimeout = null;
 					var model = self.get();
-					model && send({ TYPE: 'init', mode: model.type || 'clientside', value: model.body });
+					model && send({ TYPE: 'init', mode: model.type || 'clientside', value: model.body, darkmode: $('body').hclass('ui-dark') });
 				} else {
 					settertimeout && clearTimeout(settertimeout);
 					settertimeout = setTimeout(self.setter, 100);

@@ -48,6 +48,7 @@
 				EDITOR.refresh();
 				EDITOR.scrollTo(0, 0);
 				EDITOR.setCursor(0);
+				$('body').tclass('ui-dark', !!msg.darkmode);
 				common.init = true;
 				return;
 			}
