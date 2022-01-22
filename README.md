@@ -13,6 +13,7 @@ __Features__:
 - multiple cursors
 - works in iframe only
 - supports markers for real-time collaboration
+- no external dependencies
 
 __Cons__:
 

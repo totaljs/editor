@@ -1,5 +1,6 @@
 ECHO "[COMPILING]"
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd $DIR
-uglifyjs editor.js --config-file minify.json -o editor.min@1.js
-uglifycss editor.css > editor.min@1.css
+uglifyjs 1.js --config-file minify.json -o 1.min.js
+uglifycss 1.css > 1.min.css
+total4 --minify 1.html

@@ -1,6 +1,28 @@
 /* eslint-disable */
 if (typeof(module)=='object'){window.module=module;module=undefined}
 
+window.W = window;
+W.FUNC = {};
+W.common = {};
+W.EMPTYARRAY = [];
+
+W.HASH = function(s, unsigned) {
+	if (!s)
+		return 0;
+	else if (s instanceof Date)
+		return s.getTime();
+	var hash = 0, i, char;
+	if (!s.length)
+		return hash;
+	var l = s.length;
+	for (i = 0; i < l; i++) {
+		char = s.charCodeAt(i);
+		hash = ((hash << 5) - hash) + char;
+		hash |= 0; // Convert to 32bit integer
+	}
+	return unsigned != false ? hash >>> 0 : hash;
+};
+
 /*
 /*
  * ===========================================================================================
@@ -42,7 +64,7 @@ if (typeof(module)=='object'){window.module=module;module=undefined}
  * ===========================================================================================
  */
 
-!function(t){"object"==typeof exports&&"object"==typeof module?t(require("../../lib/codemirror"),require("../xml/xml"),require("../javascript/javascript"),require("../css/css")):"function"==typeof define&&define.amd?define(["../../lib/codemirror","../xml/xml","../javascript/javascript","../css/css"],t):t(CodeMirror)}(function(f){"use strict";var l={script:[["lang",/(javascript|babel)/i,"javascript"],["type",/^(?:text|application)\/(?:x-)?(?:java|ecma)script$|^module$|^$/i,"javascript"],["type",/./,"text/plain"],[null,null,"javascript"]],style:[["lang",/^css$/i,"css"],["type",/^(text\/)?(x-)?(stylesheet|css)$/i,"css"],["type",/./,"text/plain"],[null,null,"css"]]};var r={};function g(t,e){var a,n=t.match(r[a=e]||(r[a]=new RegExp("\\s+"+a+"\\s*=\\s*('|\")?([^'\"]+)('|\")?\\s*")));return n?/^\s*(.*?)\s*$/.exec(n[2])[1]:""}function h(t,e){return new RegExp((e?"^":"")+"</s*"+t+"s*>","i")}function o(t,e){for(var a in t)for(var n=e[a]||(e[a]=[]),l=t[a],r=l.length-1;0<=r;r--)n.unshift(l[r])}f.defineMode("htmlmixed",function(u,t){var m=f.getMode(u,{name:"xml",htmlMode:!0,multilineTagIndentFactor:t.multilineTagIndentFactor,multilineTagIndentPastTag:t.multilineTagIndentPastTag}),d={},e=t&&t.tags,a=t&&t.scriptTypes;if(o(l,d),e&&o(e,d),a)for(var n=a.length-1;0<=n;n--)d.script.unshift(["type",a[n].matches,a[n].mode]);function p(t,e){var a,n=m.token(t,e.htmlState),l=/\btag\b/.test(n);if(l&&!/[<>\s\/]/.test(t.current())&&(a=e.htmlState.tagName&&e.htmlState.tagName.toLowerCase())&&d.hasOwnProperty(a))e.inTag=a+" ";else if(e.inTag&&l&&/>$/.test(t.current())){var r=/^([\S]+) (.*)/.exec(e.inTag);e.inTag=null;var o=">"==t.current()&&function(t,e){for(var a=0;a<t.length;a++){var n=t[a];if(!n[0]||n[1].test(g(e,n[0])))return n[2]}}(d[r[1]],r[2]),c=f.getMode(u,o),i=h(r[1],!0),s=h(r[1],!1);e.token=function(t,e){return t.match(i,!1)?(e.token=p,e.localState=e.localMode=null,null):(a=t,n=s,l=e.localMode.token(t,e.localState),r=a.current(),-1<(o=r.search(n))?a.backUp(r.length-o):r.match(/<\/?$/)&&(a.backUp(r.length),a.match(n,!1)||a.match(r)),l);var a,n,l,r,o},e.localMode=c,e.localState=f.startState(c,m.indent(e.htmlState,"",""))}else e.inTag&&(e.inTag+=t.current(),t.eol()&&(e.inTag+=" "));return n}return{startState:function(){return{token:p,inTag:null,localMode:null,localState:null,htmlState:f.startState(m)}},copyState:function(t){var e;return t.localState&&(e=f.copyState(t.localMode,t.localState)),{token:t.token,inTag:t.inTag,localMode:t.localMode,localState:e,htmlState:f.copyState(m,t.htmlState)}},token:function(t,e){return e.token(t,e)},indent:function(t,e,a){return!t.localMode||/^\s*<\//.test(e)?m.indent(t.htmlState,e,a):t.localMode.indent?t.localMode.indent(t.localState,e,a):f.Pass},innerMode:function(t){return{state:t.localState||t.htmlState,mode:t.localMode||m}}}},"xml","javascript","css"),f.defineMIME("text/html","htmlmixed")});
+!function(t){"object"==typeof exports&&"object"==typeof module?t(require("../../lib/codemirror"),require("../xml/xml"),require("../javascript/javascript"),require("../css/css")):"function"==typeof define&&define.amd?define(["../../lib/codemirror","../xml/xml","../javascript/javascript","../css/css"],t):t(CodeMirror)}(function(f){"use strict";var l={script:[["lang",/(javascript|babel)/i,"javascript"],["type",/^(?:text|application)\/(?:x-)?js|(?:java|ecma|)script$|^module$|^$/i,"javascript"],["type",/./,"text/plain"],[null,null,"javascript"]],style:[["lang",/^css$/i,"css"],["type",/^(text\/)?(x-)?(stylesheet|css)$/i,"css"],["type",/./,"text/plain"],[null,null,"css"]]};var r={};function g(t,e){var a,n=t.match(r[a=e]||(r[a]=new RegExp("\\s+"+a+"\\s*=\\s*('|\")?([^'\"]+)('|\")?\\s*")));return n?/^\s*(.*?)\s*$/.exec(n[2])[1]:""}function h(t,e){return new RegExp((e?"^":"")+"</s*"+t+"s*>","i")}function o(t,e){for(var a in t)for(var n=e[a]||(e[a]=[]),l=t[a],r=l.length-1;0<=r;r--)n.unshift(l[r])}f.defineMode("htmlmixed",function(u,t){var m=f.getMode(u,{name:"xml",htmlMode:!0,multilineTagIndentFactor:t.multilineTagIndentFactor,multilineTagIndentPastTag:t.multilineTagIndentPastTag}),d={},e=t&&t.tags,a=t&&t.scriptTypes;if(o(l,d),e&&o(e,d),a)for(var n=a.length-1;0<=n;n--)d.script.unshift(["type",a[n].matches,a[n].mode]);function p(t,e){var a,n=m.token(t,e.htmlState),l=/\btag\b/.test(n);if(l&&!/[<>\s\/]/.test(t.current())&&(a=e.htmlState.tagName&&e.htmlState.tagName.toLowerCase())&&d.hasOwnProperty(a))e.inTag=a+" ";else if(e.inTag&&l&&/>$/.test(t.current())){var r=/^([\S]+) (.*)/.exec(e.inTag);e.inTag=null;var o=">"==t.current()&&function(t,e){for(var a=0;a<t.length;a++){var n=t[a];if(!n[0]||n[1].test(g(e,n[0])))return n[2]}}(d[r[1]],r[2]),c=f.getMode(u,o),i=h(r[1],!0),s=h(r[1],!1);e.token=function(t,e){return t.match(i,!1)?(e.token=p,e.localState=e.localMode=null,null):(a=t,n=s,l=e.localMode.token(t,e.localState),r=a.current(),-1<(o=r.search(n))?a.backUp(r.length-o):r.match(/<\/?$/)&&(a.backUp(r.length),a.match(n,!1)||a.match(r)),l);var a,n,l,r,o},e.localMode=c,e.localState=f.startState(c,m.indent(e.htmlState,"",""))}else e.inTag&&(e.inTag+=t.current(),t.eol()&&(e.inTag+=" "));return n}return{startState:function(){return{token:p,inTag:null,localMode:null,localState:null,htmlState:f.startState(m)}},copyState:function(t){var e;return t.localState&&(e=f.copyState(t.localMode,t.localState)),{token:t.token,inTag:t.inTag,localMode:t.localMode,localState:e,htmlState:f.copyState(m,t.htmlState)}},token:function(t,e){return e.token(t,e)},indent:function(t,e,a){return!t.localMode||/^\s*<\//.test(e)?m.indent(t.htmlState,e,a):t.localMode.indent?t.localMode.indent(t.localState,e,a):f.Pass},innerMode:function(t){return{state:t.localState||t.htmlState,mode:t.localMode||m}}}},"xml","javascript","css"),f.defineMIME("text/html","htmlmixed")});
 
 /*
  * ===========================================================================================
@@ -457,17 +479,17 @@ CodeMirror.defineMode('resources', function() {
 		trim: true
 	};
 
-	var countel = null;
+	var refreshcountdelay;
+
+	function refreshcountforce() {
+		refreshcountdelay = null;
+		var tmp = document.querySelectorAll('.cm-matchhighlight').length;
+		SEND({ TYPE: 'matchhighlight', value: tmp });
+	}
 
 	function refreshcount() {
-		if (!countel)
-			countel = $('.search').find('.count');
-		setTimeout2(defaults.style, function() {
-			if (countel) {
-				var tmp = document.querySelectorAll('.cm-matchhighlight').length;
-				countel.text(tmp + 'x').tclass('hidden', !tmp);
-			}
-		}, 100);
+		refreshcountdelay && clearTimeout(refreshcountdelay);
+		refreshcountdelay = setTimeout(refreshcountforce, 100);
 	}
 
 	function State(options) {
@@ -1206,7 +1228,6 @@ CodeMirror.defineMode('resources', function() {
 		var message;
 
 		if (window.HTMLHint) {
-			SET('code.errors', found);
 			var messages = HTMLHint.verify(text, RULES);
 			for (var i = 0; i < messages.length; i++) {
 				message = messages[i];
@@ -1217,8 +1238,6 @@ CodeMirror.defineMode('resources', function() {
 					found.push({ from: CodeMirror.Pos(startLine, startCol), to: CodeMirror.Pos(endLine, endCol), message: message.message, severity : message.type, line: startLine + 1, reason: message.message, });
 			}
 		}
-
-		SET('code.errors', found);
 		return found;
 	};
 	CodeMirror.registerHelper('lint', 'html', fn);
@@ -1744,7 +1763,7 @@ CodeMirror.defineMode('codeapi', function() {
 	function makeMarker(labels, severity, multiple, tooltips) {
 		var marker = document.createElement('div');
 		var inner = marker;
-		marker.className = 'fa CodeMirror-lint-marker-' + severity;
+		marker.className = 'CodeMirror-lint-marker-' + severity;
 
 		if (multiple) {
 			inner = marker.appendChild(document.createElement('div'));
@@ -1783,7 +1802,18 @@ CodeMirror.defineMode('codeapi', function() {
 			tip.innerHTML = ann.messageHTML;
 		else {
 			var el = document.createElement('DIV');
-			el.innerHTML = '<i class="fa fa-{0}"></i> '.format(severity === 'error' ? 'times-circle' : 'warning') + Thelpers.encode(ann.message);
+			el.innerHTML = ann.message.replace(/<|>|"/g, function(text) {
+				switch (text) {
+					case '>':
+						return '&gt;';
+					case '<':
+						return '&lt;';
+					case '"':
+						return '&quote;';
+					case '\'':
+						return '&#39;';
+				}
+			});
 			tip.appendChild(el);
 		}
 		return tip;
@@ -2409,10 +2439,6 @@ CodeMirror.defineMode('codeapi', function() {
 			if (!state.query)
 				return;
 			state.query = state.queryText = null;
-			var search = $('.search');
-			search.find('input').val('').rclass('is');
-			search.find('.search-op').prop('disabled', true);
-			search.find('.search-cancel').tclass('hidden', true);
 			cm.removeOverlay(state.overlay);
 			if (state.annotate) {
 				state.annotate.clear();
@@ -2421,68 +2447,6 @@ CodeMirror.defineMode('codeapi', function() {
 		});
 	}
 
-	FIND('editor', function(com) {
-		var cm = com.editor;
-		var el = $('.search');
-		var input = el.find('input');
-
-		var state = function(t) {
-			var is = !!t.value;
-			input.tclass('is', is);
-			el.find('.search-op').prop('disabled', !is);
-			el.find('.search-cancel').tclass('hidden', !is);
-		};
-
-		input.on('focus blur', function(e) {
-			input.tclass('b', e.type === 'focus');
-		});
-
-		el.on('click', 'button', function() {
-			var t = this;
-			switch (t.name) {
-				case 'prev':
-					cm.execCommand('findPrev');
-					break;
-				case 'next':
-					cm.execCommand('findNext');
-					break;
-				case 'clear':
-					el.find('input').val('');
-					cm.execCommand('clearSearch');
-					cm.focus();
-					cm.doc.setCursor(cm.doc.getCursor());
-					state(el[0]);
-					break;
-			}
-		});
-
-		el.find('input').on('keydown', function(e) {
-			var t = this;
-			switch (e.which) {
-				case 13:
-					if (t.value) {
-						startSearch(cm, getSearchState(cm), t.value);
-						cm.execCommand('findNext');
-					} else
-						cm.execCommand('clearSearch');
-					break;
-				case 27:
-					// t.value = '';
-					cm.execCommand('clearSearch');
-					cm.focus();
-					break;
-				case 40:
-				case 38:
-					cm.focus();
-					e.preventDefault();
-					e.stopPropagation();
-					break;
-			}
-			setTimeout2('searchinput', state, 500, null, t);
-		});
-	});
-
-	CodeMirror.commands.find = function() { $('.search').find('input').focus().select(); };  // doSearch(cm);
 	CodeMirror.commands.findPersistent = function(cm) { clearSearch(cm); doSearch(cm, false, true);};
 	CodeMirror.commands.findPersistentNext = function(cm) { doSearch(cm, false, true, true);};
 	CodeMirror.commands.findPersistentPrev = function(cm) { doSearch(cm, true, true, true);};
@@ -2968,8 +2932,11 @@ var jsonlint=function(){var a={trace:function(){},yy:{},symbols_:{error:2,JSONSt
 	}
 });
 
-COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent:auto;margin:0', function(self, config, cls) {
+window.INIT_EDITOR = (function(el) {
 
+	var W = window;
+	var cls = 'ui-editor';
+	var self = {};
 	var editor, container;
 	var cls2 = '.' + cls;
 	var HSM = { annotateScrollbar: true, delay: 100 };
@@ -2978,9 +2945,8 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 	var skip = false;
 	var markers = {};
 
-	self.getter = null;
-	self.nocompile();
-	self.readonly();
+	self.ID = Date.now().toString(36);
+	self.dom = el;
 
 	var hexrgba = function (hex, alpha){
 		var c;
@@ -3018,13 +2984,9 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 	};
 
 	self.resizeforce = function() {
-		if (config.parent) {
-			var parent = self.parent(config.parent);
-			var h = parent.height();
-			editor.setSize('100%', (h - config.margin) + 'px');
-			self.css('height', h - config.margin);
-		} else
-			editor.setSize('100%', config.height + 'px');
+		var h = W.innerHeight;
+		editor.setSize('100%', h + 'px');
+		self.dom.style.height = h + 'px';
 	};
 
 	self.gotoline = function(pos) {
@@ -3070,7 +3032,7 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 
 	self.make = function() {
 
-		self.event('contextmenu', function(e) {
+		W.addEventListener('contextmenu', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
 			setTimeout(editor_contextmenu, 100, e, editor);
@@ -3193,10 +3155,9 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 			};
 		};
 
-		var content = config.label || self.html();
 		var opt = {};
-		opt.lineNumbers = config.linenumbers;
-		opt.mode = config.type || 'clientside';
+		opt.lineNumbers = true;
+		opt.mode = 'clientside';
 		opt.indentUnit = 4;
 		opt.scrollbarStyle = 'simple';
 		opt.scrollPastEnd = true;
@@ -3208,7 +3169,6 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		opt.indentWithTabs = true;
 		opt.styleActiveLine = true;
 		opt.autoCloseBrackets = true;
-		// opt.lineWrapping = true;
 		opt.matchBrackets = true;
 		opt.showTrailingSpace = false;
 		opt.rulers = [{ column: 130, lineStyle: 'dashed' }, { column: -1, lineStyle: 'dashed' }];
@@ -3256,10 +3216,12 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		var checkerrors = function() {
 			checkerrorstimeout = null;
 			if (editor.options.mode === 'clientside' || editor.options.mode === 'htmlmixed' || editor.options.mode === 'css') {
-				var errors = [];
-				for (var err of editor.state.lint.marked)
-					errors.push({ error: err.__annotation.reason, line: err.__annotation.line });
-				SEND({ TYPE: 'errors', value: errors });
+				if (editor.state.lint && editor.state.lint.marked) {
+					var errors = [];
+					for (var err of editor.state.lint.marked)
+						errors.push({ error: err.__annotation.reason, line: err.__annotation.line });
+					SEND({ TYPE: 'errors', value: errors });
+				}
 			};
 		};
 
@@ -3372,11 +3334,18 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		});
 
 		editor.Total = {};
+
+		editor.Total.self = self;
+
+		editor.Total.readonly = function(is) {
+			editor.setOption('readOnly', !!is);
+		};
+
 		editor.Total.marker = function(name, from, to, color) {
 
 			if (!name) {
 				for (var key in markers) {
-					markers[key].remove();
+					markers[key].parentNode.removeChild(markers[key]);
 					delete markers[key];
 				}
 				return;
@@ -3386,7 +3355,7 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 
 			if (!from) {
 				if (markers[id]) {
-					markers[id].remove();
+					markers[id].parentNode.removeChild(markers[id]);
 					delete markers[id];
 				}
 				return;
@@ -3405,22 +3374,33 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 			}*/
 
 			var pos = EDITOR.cursorCoords(from);
-			var css = { left: pos.left, top: pos.top - 15 };
 
 			if (!markers[id]) {
-				var div = $('<div class="{0}-marker" style="border-color:{1}"><span style="background-color:{1}">{2}</span></div>'.format(cls, hexrgba(color, 0.5), name));
+				var div = document.createElement('DIV');
+				var span = document.createElement('SPAN');
+				div.classList.add(cls + '-marker');
+				span.style.background = div.style.borderColor = hexrgba(color, 0.5);
+				div.appendChild(span);
+				span.innerHTML = name;
 				markers[id] = div;
-				div.find('span').on('click', function() {
-					$(this).parent().tclass(cls + '-marker-hide');
+				span.addEventListener('click', function() {
+					var c = cls + '-marker-hide';
+					var parent = span.parentNode;
+					var is = parent.classList.contains(c);
+					if (is)
+						parent.classList.remove(c);
+					else
+						parent.classList.add(c);
 				});
-				self.append(div);
+				self.dom.appendChild(div);
 			}
 
-			markers[id].css(css);
+			markers[id].style.left = pos.left + 'px';
+			markers[id].style.top = (pos.top - 15) + 'px';
 		};
 
 		self.resizeforce();
-		self.on('resize + resize2', self.resize);
+		W.addEventListener('resize', self.resize);
 		SEND({ TYPE: 'init' });
 	};
 
@@ -3437,8 +3417,6 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		var c = editor.editor.getRange({ line: cur.line, ch: cur.ch - 1 }, { line: cur.line, ch: cur.ch });
 		fn(editor.editor, cur, c);
 	};
-
-}, [function(next) {
 
 	(function(mod) {
 		mod(CodeMirror);
@@ -3604,8 +3582,8 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		this.scrollTo(null, (coords.top + coords.bottom - h) / 2);
 	});
 
-	next();
-}]);
+	self.make();
+});
 
 var TTIC = ['#1abc9c','#2ecc71','#3498db','#9b59b6','#34495e','#16a085','#2980b9','#8e44ad','#2c3e50','#f1c40f','#e67e22','#e74c3c','#d35400','#c0392b'];
 
@@ -3643,6 +3621,15 @@ function editor_contextmenu(e, editor) {
 	SEND(msg);
 }
 
+(function() {
+	common.query = {};
+	var arr = location.search.substring(1).split('&');
+	for (var arg of arr) {
+		var kv = arg.split('=');
+		common.query[kv[0]] = decodeURIComponent(kv[1]);
+	}
+})();
+
 function SEND(msg, callback) {
 
 	if (callback) {
@@ -3650,7 +3637,7 @@ function SEND(msg, callback) {
 		 common.callbacks[msg.callbackid] = callback;
 	}
 
-	msg.id = NAV.query.id;
+	msg.id = common.query.id;
 	msg.totaleditor = 1;
 	W.parent.postMessage(msg, '*');
 }

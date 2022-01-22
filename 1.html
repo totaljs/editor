@@ -1,24 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Code editor</title>
+	<title>Total.js Code Editor</title>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=11" />
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<meta name="robots" content="all,follow" />
-	<link href="https://cdn.componentator.com/spa.min@19.css" rel="stylesheet" type="text/css" />
-	<script src="https://cdn.componentator.com/spa.min@19.js"></script>
-	<link href="editor.min@1.css" rel="stylesheet" type="text/css" />
-	<script src="editor.min@1.js"></script>
+	<link href="1.min.css" rel="stylesheet" type="text/css" />
+	<script src="1.min.js"></script>
 </head>
 <body>
 
-	<div data---="editor__common.body"></div>
+	<div id="TOTALEDITOR"></div>
 
 	<script>
-
-		var common = {};
 
 		common.version = 1;
 		common.callbackid = 1;
@@ -41,6 +37,7 @@
 				// msg.docid
 
 				EDITOR.Total.realtime = !!msg.realtime;
+				EDITOR.Total.readonly(!!msg.readonly);
 				EDITOR.setOption('mode', msg.mode);
 				EDITOR.setOption('lint', msg.mode === 'javascript' || msg.mode === 'xml' || msg.mode === 'clientside' || msg.mode === 'serverside' || msg.mode === 'html' ? { esversion: 8, expr: true, evil: true, unused: true, shadow: true, node: true, browser: true } : false);
 				EDITOR.setOption('matchBrackets', true);
@@ -50,8 +47,18 @@
 				EDITOR.refresh();
 				EDITOR.scrollTo(0, 0);
 				EDITOR.setCursor(0);
-				$('body').tclass('ui-dark', !!msg.darkmode);
+
+
+				var b = document.body;
+
+				if (msg.darkmode)
+					b.classList.add('ui-dark');
+				else
+					b.classList.remove('ui-dark');
+
 				common.init = true;
+				common.id = msg.id;
+				common.docid = msg.docid;
 				return;
 			}
 
@@ -68,8 +75,16 @@
 				return;
 			}
 
+			if (msg.TYPE === 'readonly') {
+				EDITOR.Total.readonly(msg.value);
+				return;
+			}
+
 			if (msg.TYPE === 'darkmode') {
-				$('body').tclass('ui-dark', !!msg.value);
+				if (msg.value)
+					b.classList.add('ui-dark');
+				else
+					b.classList.remove('ui-dark');
 				return;
 			}
 
@@ -152,7 +167,7 @@
 			}
 
 			if (msg.TYPE === 'goto') {
-				msg.value && SETTER('editor/gotoline', msg.value);
+				msg.value && EDITOR.self.gotoline(msg.value);
 				return;
 			}
 
@@ -162,7 +177,7 @@
 			}
 
 			if (msg.TYPE === 'clear') {
-				SETTER('editor/clear');
+				EDITOR.Total.self.clear();
 				return;
 			}
 
@@ -185,12 +200,10 @@
 		});
 
 		W.addEventListener('message', function(e) {
-			if (typeof(e.data) === 'string') {
-				try {
-					PROCESS(PARSE(e.data));
-				} catch (e) {}
-			}
+			e.data && PROCESS(typeof(e.data) === 'string' ? JSON.parse(e.data) : e.data);
 		});
+
+		INIT_EDITOR(TOTALEDITOR);
 
 	</script>
 
