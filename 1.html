@@ -20,6 +20,7 @@
 
 		var common = {};
 
+		common.version = 1;
 		common.callbackid = 1;
 		common.callbacks = {};
 		common.init = false;
@@ -39,6 +40,7 @@
 
 				// msg.docid
 
+				EDITOR.Total.realtime = !!msg.realtime;
 				EDITOR.setOption('mode', msg.mode);
 				EDITOR.setOption('lint', msg.mode === 'javascript' || msg.mode === 'xml' || msg.mode === 'clientside' || msg.mode === 'serverside' || msg.mode === 'html' ? { esversion: 8, expr: true, evil: true, unused: true, shadow: true, node: true, browser: true } : false);
 				EDITOR.setOption('matchBrackets', true);
@@ -71,6 +73,21 @@
 				return;
 			}
 
+			if (msg.TYPE === 'change') {
+				var history = EDITOR.doc.history.done;
+				var arr = msg.value;
+				if (arr instanceof Array) {
+					EDITOR.Total.realtime = false;
+					for (var item of arr) {
+						EDITOR.replaceRange(item.text, item.from, item.to);
+						history.pop();
+						history.pop();
+					}
+					EDITOR.Total.realtime = true;
+				}
+				return;
+			}
+
 			if (msg.TYPE === 'insert') {
 				msg.value && EDITOR.replaceSelection(msg.value);
 				return;
@@ -99,13 +116,8 @@
 				return;
 			}
 
-			if (msg.TYPE === 'markeradd') {
-				EDITOR.Total.markeradd(msg.from, msg.to, msg.value, msg.color);
-				return;
-			}
-
-			if (msg.TYPE === 'markerrem') {
-				EDITOR.Total.markerrem(msg.value);
+			if (msg.TYPE === 'marker') {
+				EDITOR.Total.marker(msg.value, msg.from, msg.to, msg.color);
 				return;
 			}
 

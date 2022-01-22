@@ -3073,7 +3073,7 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		self.event('contextmenu', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
-            setTimeout(editor_contextmenu, 100, e, editor);
+			setTimeout(editor_contextmenu, 100, e, editor);
 		});
 
 		var clearsearch = function() {
@@ -3225,7 +3225,7 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 
 		editor.on('cursorActivity', function() {
 			emitcursortimeout && clearTimeout(emitcursortimeout);
-			emitcursortimeout = setTimeout(emitcursor, 80);
+			emitcursortimeout = setTimeout(emitcursor, 150);
 		});
 
 		editor.on('endCompletion', function(a, b) {
@@ -3264,6 +3264,15 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		};
 
 		var checkerrorstimeout = null;
+		var synctimeout = null;
+		var changes = [];
+
+		var sync = function() {
+			synctimeout = null;
+			SEND({ TYPE: 'change', value: changes.splice(0) });
+			emitcursortimeout && clearTimeout(emitcursortimeout);
+			emitcursortimeout = setTimeout(emitcursor, 150);
+		};
 
 		editor.on('change', function(a, b) {
 
@@ -3277,6 +3286,16 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 					memory = editor.getValue().split('\n');
 					return;
 				}
+			}
+
+			if (editor.Total.realtime && b.origin !== 'setValue') {
+				var obj = {};
+				obj.from = { line: b.from.line, ch: b.from.ch };
+				obj.to = { line: b.to.line, ch: b.to.ch };
+				obj.text = b.text;
+				changes.push(obj);
+				synctimeout && clearTimeout(synctimeout);
+				synctimeout = setTimeout(sync, 500);
 			}
 
 			var lf = b.from.line;
@@ -3353,9 +3372,25 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 		});
 
 		editor.Total = {};
-		editor.Total.markeradd = function(from, to, name, color) {
+		editor.Total.marker = function(name, from, to, color) {
+
+			if (!name) {
+				for (var key in markers) {
+					markers[key].remove();
+					delete markers[key];
+				}
+				return;
+			}
 
 			var id = HASH(name).toString(36);
+
+			if (!from) {
+				if (markers[id]) {
+					markers[id].remove();
+					delete markers[id];
+				}
+				return;
+			}
 
 			if (!color)
 				color = makehexcolor(id);
@@ -3382,11 +3417,6 @@ COMPONENT('editor', 'linenumbers:true;required:false;trim:false;tabs:true;parent
 			}
 
 			markers[id].css(css);
-		};
-
-		editor.Total.markerrem = function(name) {
-			var id = HASH(name).toString(36);
-			markers[id] && markers[id].remove();
 		};
 
 		self.resizeforce();
