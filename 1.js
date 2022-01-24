@@ -6,6 +6,14 @@ W.FUNC = {};
 W.common = {};
 W.EMPTYARRAY = [];
 
+String.prototype.format = function() {
+	var arg = arguments;
+	return this.replace(/\{\d+\}/g, function(text) {
+		var value = arg[+text.substring(1, text.length - 1)];
+		return value == null ? '' : value instanceof Array ? value.join('') : value;
+	});
+};
+
 W.HASH = function(s, unsigned) {
 	if (!s)
 		return 0;
