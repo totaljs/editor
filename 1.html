@@ -38,6 +38,8 @@
 
 				EDITOR.Total.realtime = !!msg.realtime;
 				EDITOR.Total.readonly(!!msg.readonly);
+				EDITOR.Total.keywords_search = msg.keywords ? new RegExp('.(' + msg.keywords.replace(/\,/g, '|') + ').') : null;
+				EDITOR.Total.keywords = msg.keywords ? msg.keywords.split(/\,/g) : null;
 				EDITOR.setOption('mode', msg.mode);
 				EDITOR.setOption('lint', msg.mode === 'javascript' || msg.mode === 'xml' || msg.mode === 'clientside' || msg.mode === 'serverside' || msg.mode === 'html' ? { esversion: 8, expr: true, evil: true, unused: true, shadow: true, node: true, browser: true } : false);
 				EDITOR.setOption('matchBrackets', true);
@@ -47,7 +49,6 @@
 				EDITOR.refresh();
 				EDITOR.scrollTo(0, 0);
 				EDITOR.setCursor(0);
-
 
 				var b = document.body;
 
@@ -72,6 +73,12 @@
 				}
 				EDITOR.keepdiff = true;
 				EDITOR.setValue(val);
+				return;
+			}
+
+			if (msg.TYPE === 'keywords') {
+				EDITOR.Total.keywords = msg.keywords ? new RegExp('.(' + msg.keywords.replace(/\,/g, '|') + ').') : null;
+				EDITOR.refresh();
 				return;
 			}
 

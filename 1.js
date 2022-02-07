@@ -1446,7 +1446,7 @@ CodeMirror.defineMode('serverside', function(config) {
 
 CodeMirror.defineMode('totaljs:inner', function() {
 	return {
-		token: function(stream) {
+		token: function(stream, state) {
 
 			if (stream.match(/@{.*?}/, true))
 				return 'variable-T';
@@ -1474,6 +1474,19 @@ CodeMirror.defineMode('totaljs:inner', function() {
 
 			if (stream.match(/data-import|(data-jc-(url|scope|import|cache|path|config|id|type|init|class))=/, true))
 				return 'variable-E';
+
+			if (EDITOR.Total.keywords_search) {
+				var keyword = stream.match(EDITOR.Total.keywords_search, true);
+				if (keyword) {
+					var a = keyword[0];
+					var c = keyword[0].charAt(0);
+					if ((/[^a-z]/i).test(c)) {
+						stream.start++;
+						stream.pos--;
+						return 'variable-R';
+					}
+				}
+			}
 
 			var m = stream.match(/(ROUTE|AJAX|AJAXCACHEREVIEW|AJAXCACHE)\(/, true);
 			if (m) {
@@ -2987,11 +3000,15 @@ window.INIT_EDITOR = (function(el) {
 		editor.replaceSelection(value);
 	};
 
+	var resizetimer = null;
+
 	self.resize = function() {
-		setTimeout2(self.ID, self.resizeforce, 300);
+		resizetimer && clearTimeout(resizetimer);
+		resizetimer = setTimeout(self.ID, self.resizeforce, 300);
 	};
 
 	self.resizeforce = function() {
+		resizetimer = null;
 		var h = W.innerHeight;
 		editor.setSize('100%', h + 'px');
 		self.dom.style.height = h + 'px';

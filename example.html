@@ -16,12 +16,13 @@
 
 	<div class="padding">
 		<div style="width:600px;height:300px;border:1px solid #E0E0E0;">
-			<div data---="cloudeditor__editormodel__contextmenu:editorcontextmenu;event:editorevent;autosave:0"></div>
+			<div data---="cloudeditor__editormodel__contextmenu:editorcontextmenu;event:editorevent;autosave:0;keywords:PATH|ID"></div>
 		</div>
+		<!--
 		<br />
 		<div style="width:600px;height:300px;border:1px solid #E0E0E0;">
 			<div data---="cloudeditor__editormodel__contextmenu:editorcontextmenu;autosave:0;$id:mirrored;readonly:1"></div>
-		</div>
+		</div>-->
 	</div>
 
 	<script>
@@ -136,7 +137,7 @@
 			};
 
 			self.make = function() {
-				self.append('<iframe src="1.min.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
+				self.append('<iframe src="1.html?id={0}" frameborder="0" scrolling="no" allowtransparency="true" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" style="width:100%"></iframe>'.format(self.ID));
 				iframe = self.find('iframe');
 				self.resize();
 				$(W).on('message', onmessage);
@@ -209,7 +210,7 @@
 				if (init) {
 					settertimeout = null;
 					var model = self.get();
-					model && send({ TYPE: 'init', realtime: true, readonly: config.readonly, mode: model.type || 'clientside', value: model.body, darkmode: $('body').hclass('ui-dark') });
+					model && send({ TYPE: 'init', realtime: true, readonly: config.readonly, mode: model.type || 'clientside', value: model.body, keywords: config.keywords ? config.keywords : null, darkmode: $('body').hclass('ui-dark') });
 				} else {
 					settertimeout && clearTimeout(settertimeout);
 					settertimeout = setTimeout(self.setter, 100);
@@ -222,12 +223,9 @@
 
 		var content = [];
 
-		content.push('<h1>Hello world</h1>');
-		content.push('<p>Lorem ipsum, dolor, sit amet consectetur adipisicing elit. Repudiandae, praesentium!</p>');
-		content.push('');
-		content.push('<scr' + 'ipt>');
-		content.push('\tvar name = \'Total.js\';');
-		content.push('</scr' + 'ipt>');
+		content.push('A');
+		content.push('<p>amet ID </p>');
+		content.push('B');
 
 		var editormodel = { mode: 'clientside', body: content.join('\n') };
 
