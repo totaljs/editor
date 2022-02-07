@@ -3004,7 +3004,7 @@ window.INIT_EDITOR = (function(el) {
 
 	self.resize = function() {
 		resizetimer && clearTimeout(resizetimer);
-		resizetimer = setTimeout(self.ID, self.resizeforce, 300);
+		resizetimer = setTimeout(self.resizeforce, 300);
 	};
 
 	self.resizeforce = function() {
