@@ -1478,9 +1478,9 @@ CodeMirror.defineMode('totaljs:inner', function() {
 			if (EDITOR.Total.keywords_search) {
 				var keyword = stream.match(EDITOR.Total.keywords_search, true);
 				if (keyword) {
-					var a = keyword[0];
-					var c = keyword[0].charAt(0);
-					if ((/[^a-z]/i).test(c)) {
+					var beg = keyword[0].charAt(0);
+					var end = keyword[0].charAt(keyword[0].length - 1);
+					if ((/[^a-z]/i).test(beg) && (/[^a-z]/i).test(end)) {
 						stream.start++;
 						stream.pos--;
 						return 'variable-R';
