@@ -46,7 +46,7 @@ html,body { overflow: hidden; font-family: Arial; font-size: 12px; margin: 0; pa
 .CodeMirror-gutters { background-color: #FFF; }
 .CodeMirror-scroll { overflow-scrolling: touch; }
 .CodeMirror-scrollbar-filler { background-color: #F0F0F0; }
-.CodeMirror-simplescroll-horizontal div, .CodeMirror-simplescroll-vertical div { position: absolute; background: #D0D0D0; box-sizing: border-box; /* border-radius: 4px; */ }
+.CodeMirror-simplescroll-horizontal div, .CodeMirror-simplescroll-vertical div { position: absolute; background: #D0D0D0; box-sizing: border-box; border-radius: 4px; }
 .CodeMirror-simplescroll-horizontal, .CodeMirror-simplescroll-vertical { position: absolute; z-index: 6; background: #F0F0F0; }
 .CodeMirror-simplescroll-horizontal { bottom: 0; left: 0; height: 8px; }
 .CodeMirror-simplescroll-horizontal div { bottom: 0; height: 100%; }
