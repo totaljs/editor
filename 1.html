@@ -44,6 +44,9 @@
 				EDITOR.setOption('lint', msg.mode === 'javascript' || msg.mode === 'xml' || msg.mode === 'clientside' || msg.mode === 'serverside' || msg.mode === 'html' ? { esversion: 8, expr: true, evil: true, unused: true, shadow: true, node: true, browser: true } : false);
 				EDITOR.setOption('matchBrackets', true);
 				EDITOR.setOption('lineWrapping', msg.mode === 'markdown');
+
+				var tmp = msg.linenumbers;
+				EDITOR.setOption('lineNumbers', tmp !== false && tmp !== 0);
 				EDITOR.setOption('highlightSelectionMatches', { annotateScrollbar: true, delay: 100 });
 				EDITOR.setValue(msg.body || msg.value || '');
 				EDITOR.refresh();
