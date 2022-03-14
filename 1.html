@@ -158,6 +158,11 @@
 				return;
 			}
 
+			if (msg.TYPE === 'exec') {
+				document.execCommand(msg.a, msg.b, msg.c);
+				return;
+			}
+
 			if (msg.TYPE === 'search') {
 				var cursor = EDITOR.getSearchCursor(msg.value);
 				var output = [];

@@ -113,6 +113,7 @@ html,body { overflow: hidden; font-family: Arial; font-size: 12px; margin: 0; pa
 .CodeMirror-cursor { border-left-width: 2px; }
 .ui-dark .CodeMirror-cursor { border-left-color: #f8f8f0; }
 .CodeMirror .cm-working2 { color: #1C88BB; }
+div.CodeMirror span.CodeMirror-matchingbracket { border-bottom: 2px solid blue; color: inherit; }
 
 .ui-dark span.cm-comment { color: #6f6f6e; }
 .ui-dark span.cm-atom { color: #ae81ff; }
@@ -165,3 +166,4 @@ html,body { overflow: hidden; font-family: Arial; font-size: 12px; margin: 0; pa
 .ui-dark .cm-variable-E { background-color: rgba(97,142,193,.2); color: #618EC1; }
 .ui-dark .cm-variable-B { background-color: rgba(27,27,27,.35); color: #84d087; }
 .ui-dark .cm-uname b { color: #FFF; }
+.ui-dark .CodeMirror-matchingbracket { text-decoration: underline; color: #FFF !important; }
