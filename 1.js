@@ -3189,6 +3189,7 @@ window.INIT_EDITOR = (function(el) {
 		};
 
 		var opt = {};
+		opt.dragDrop = false;
 		opt.lineNumbers = true;
 		opt.mode = 'clientside';
 		opt.indentUnit = 4;
