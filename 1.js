@@ -3345,7 +3345,20 @@ window.INIT_EDITOR = (function(el) {
 			}
 		});
 
+		var isfirefox = navigator.userAgent.includes('Firefox');
+
 		editor.on('keydown', function(editor, e) {
+
+			if ((e.ctrlKey || e.metaKey) && isfirefox) {
+				switch (e.code) {
+					case 'BracketRight':
+					case 'BracketLeft':
+						editor.execCommand('indent' + (e.code === 'BracketLeft' ? 'Less' : 'More'));
+						e.stopPropagation();
+						e.preventDefault();
+						return;
+				}
+			}
 
 			if (e.shiftKey && e.ctrlKey && (e.keyCode === 40 || e.keyCode === 38)) {
 				var tmp = editor.getCursor();
