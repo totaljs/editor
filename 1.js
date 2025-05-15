@@ -3206,7 +3206,7 @@ window.INIT_EDITOR = (function(el) {
 		opt.matchBrackets = true;
 		opt.showTrailingSpace = false;
 		opt.rulers = [{ column: 130, lineStyle: 'dashed' }, { column: -1, lineStyle: 'dashed' }];
-		opt.extraKeys = { 'Alt-F': 'findPersistent', 'Alt-Enter': adddate, 'Ctrl-Enter': findnext, 'Ctrl-/': comment, 'Cmd-/': comment, 'Ctrl--': comment, 'Cmd--': comment, 'Cmd-Enter': findnext, 'Esc': clearsearch, 'Cmd-D': findmatch, 'Ctrl-D': findmatch, 'Cmd-S': addshortcut('save'), 'Ctrl-S': addshortcut('save'), 'Alt-W': addshortcut('close'), 'Cmd-W': addshortcut('close'), Enter: 'newlineAndIndentContinue', Tab: tabulator, 'Alt-Tab': addshortcut('nexttab') };
+		opt.extraKeys = { 'Alt-F': 'findPersistent', 'Alt-Enter': adddate, 'Ctrl-Enter': findnext, 'Ctrl-/': comment, 'Cmd-/': comment, 'Ctrl--': comment, 'Cmd--': comment, 'Cmd-Enter': findnext, 'Esc': clearsearch, 'Cmd-D': findmatch, 'Ctrl-D': findmatch, 'Cmd-S': addshortcut('save'), 'Ctrl-S': addshortcut('save'), 'Cmd-B': addshortcut('build'), 'Ctrl-B': addshortcut('build'), 'Cmd-C': addshortcut('cancel'), 'Ctrl-C': addshortcut('cancel'), 'F10': addshortcut('logs'), 'Alt-W': addshortcut('close'), 'Cmd-W': addshortcut('close'), Enter: 'newlineAndIndentContinue', Tab: tabulator, 'Alt-Tab': addshortcut('nexttab') };
 
 		W.EDITOR = editor = CodeMirror(self.dom, opt);
 		self.editor = editor;
