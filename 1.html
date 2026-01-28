@@ -37,6 +37,7 @@
 				// msg.docid
 
 				EDITOR.Total.realtime = !!msg.realtime;
+				EDITOR.Total.upload = msg.upload || '';
 				EDITOR.Total.readonly(!!msg.readonly);
 				EDITOR.Total.keywords_search = msg.keywords ? new RegExp('.(' + msg.keywords.replace(/\,/g, '|') + ').') : null;
 				EDITOR.Total.keywords = msg.keywords ? msg.keywords.split(/\,/g) : null;

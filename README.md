@@ -25,6 +25,7 @@ __Cons__:
 __Dependencies__:
 
 ```bash
+$ npm install -g total5
 $ npm install -g uglifyjs
 $ npm install -g uglifycss
 ````
