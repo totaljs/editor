@@ -7,7 +7,7 @@ Fs.readFile('1.min.html', 'utf8', function(err, html) {
 			let search = '<script src="1.min.js"></script>';
 			let index = html.indexOf(search);
 			html = html.substring(0, index) + '<script>' + js + '</script>' + html.substring(index + search.length);
-			Fs.writeFile('editor.min.html', html, 'utf8', console.log);
+			Fs.writeFile('editor.min@1.html', html, 'utf8', console.log);
 		});
 	});
 });
